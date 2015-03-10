@@ -9,4 +9,6 @@
 /.nbproject
 musique-core/main/java/src/com/tulskiy/musique/Test.java
 target
-
+*.prefs
+*.project
+*.classpath

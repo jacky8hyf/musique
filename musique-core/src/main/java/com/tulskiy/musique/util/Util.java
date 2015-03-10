@@ -195,8 +195,10 @@ public class Util {
         return String.format("%1$-" + n + "s", s);
     }
 
+    // # causes error. "Depends on the definition of Formattable."
+    // http://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
     public static String leftPad(String s, int n) {
-        return String.format("%1$#" + n + "s", s);
+        return String.format("%1$" + n + "s", s);
     }
 
     public static String formatFieldValues(Object values) {

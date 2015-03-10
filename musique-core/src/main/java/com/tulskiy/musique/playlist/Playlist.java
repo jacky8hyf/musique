@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,15 +45,20 @@ import java.util.logging.Logger;
 
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.datatype.Pair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.TTPLParser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.AudioMath;
+import com.tulskiy.musique.util.EncodingDetector;
 import com.tulskiy.musique.util.Util;
 
 /**
@@ -60,6 +66,8 @@ import com.tulskiy.musique.util.Util;
  * Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
+
+    private static final Charset CHARSET = Charset.forName("UTF-8");
 
 	private static final String OLD_META_KEY_COMMENT = "comment";
 	private static final String OLD_META_KEY_GENRE = "genre";
@@ -289,6 +297,237 @@ public class Playlist extends ArrayList<Track> {
         }
     }
 
+    public void saveJSON (File file) {
+        saveJSON(file, 0);
+    }
+
+    public void saveLineWrappedJSON (File file) {
+        saveJSON(file, 2);
+    }
+
+    private void saveJSON (File file, int indentFactor) {
+        JSONObject js = new JSONObject();
+        try {
+            // remove the garbage
+            cleanUp();
+            logger.fine("Saving playlist: " + file.getName());
+            // DataOutputStream dos = new DataOutputStream(
+            // new BufferedOutputStream(new FileOutputStream(file)));
+            // dos.write(MAGIC);
+            // dos.writeInt(VERSION);
+            js.put("version", VERSION);
+            // dos.writeInt(size());
+            List<Pair> meta = new LinkedList<Pair>();
+            TrackData trackData;
+            JSONArray tracks = new JSONArray();
+            for (Track track : this) {
+                trackData = track.getTrackData();
+                trackData.removeEmptyTagFields();
+                JSONObject trackObj = new JSONObject();
+                // dos.writeUTF(trackData.getLocation().toString());
+                trackObj.put("location", trackData.getLocation().toString());
+                // dos.writeLong(trackData.getStartPosition());
+                trackObj.put("start", trackData.getStartPosition());
+                // dos.writeLong(trackData.getTotalSamples());
+                trackObj.put("samples", trackData.getTotalSamples());
+                // dos.writeInt(trackData.getSubsongIndex());
+                trackObj.put("idx", trackData.getSubsongIndex());
+                if (trackData.getSubsongIndex() > 0) {
+                    // dos.writeBoolean(trackData.isCueEmbedded());
+                    trackObj.put("cue_embedded", trackData.isCueEmbedded() ? 1 : 0);
+                    if (!trackData.isCueEmbedded())
+                        // dos.writeUTF(trackData.getCueLocation());
+                        trackObj.put("cue_location", trackData.getCueLocation());
+                }
+                // dos.writeInt(trackData.getBps());
+                trackObj.put("bps", trackData.getBps());
+                // dos.writeInt(trackData.getChannels());
+                trackObj.put("channels", trackData.getChannels());
+                // dos.writeInt(trackData.getSampleRate());
+                trackObj.put("sample_rate", trackData.getSampleRate());
+                // dos.writeInt(trackData.getBitrate());
+                trackObj.put("bit_rate", trackData.getBitrate());
+                // dos.writeLong(trackData.getDateAdded());
+                trackObj.put("date_added", trackData.getDateAdded());
+                // dos.writeLong(trackData.getLastModified());
+                trackObj.put("last_modified", trackData.getLastModified());
+
+                meta.clear();
+                if (!Util.isEmpty(trackData.getCodec()))
+                    meta.add(new Pair(META_KEY_CODEC, trackData.getCodec()));
+
+                if (!Util.isEmpty(trackData.getEncoder())) {
+                    meta.add(new Pair(META_KEY_ENCODER, trackData.getEncoder()));
+                }
+                Iterator<Entry<FieldKey, FieldValues>> fields = trackData
+                        .getAllTagFieldValuesIterator();
+                if (fields != null) {
+                    while (fields.hasNext()) {
+                        Entry<FieldKey, FieldValues> field = fields.next();
+                        for (int i = 0; i < field.getValue().size(); i++) {
+                            String value = field.getValue().get(i);
+                            meta.add(new Pair(field.getKey().toString(), value));
+                        }
+                    }
+                }
+                JSONObject metaObj = new JSONObject();
+                // dos.writeInt(meta.size());
+                for (Pair pair : meta) {
+                    // dos.writeUTF(pair.getKey());
+                    // dos.writeUTF(pair.getValue());
+                    metaObj.put(pair.getKey(), pair.getValue());
+                }
+                trackObj.put("meta", metaObj);
+                tracks.put(trackObj);
+            }
+
+            // dos.close();
+            js.put("tracks", tracks);
+            regroup();
+        } catch (JSONException e) {
+            logger.warning("cannot serialize playlist" + file.getName() + ": " + e.getMessage());
+            return;
+        }
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(js.toString(indentFactor).getBytes(CHARSET));
+        } catch (IOException e) {
+            logger.warning("Failed to save playlist " + file.getName() + ": " + e.getMessage());
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                // best effort closing
+            }
+        }
+    }
+
+    public void loadJSON(File file) {
+        String read;
+        Scanner scan = null;
+        try {
+            scan = new Scanner(EncodingDetector.getInputStreamReader(file, CHARSET)).useDelimiter("\\A");
+            read = scan.next();
+        } catch (IOException e) {
+            logger.warning("Failed to load playlist " + file.getName() + ": "
+                    + e.getMessage());
+            return;
+        } finally {
+            scan.close();
+        }
+        try {
+            JSONObject js = new JSONObject(read.trim());
+            TrackDataCache cache = TrackDataCache.getInstance();
+            logger.fine("Loading musique playlist: " + file.getName());
+//            DataInputStream dis = new DataInputStream(
+//                    new BufferedInputStream(new FileInputStream(file)));
+
+//            byte[] b = new byte[MAGIC.length];
+//            dis.readFully(b);
+//            if (!Arrays.equals(b, MAGIC)) {
+//                logger.warning("Wrong magic word");
+//                throw new RuntimeException();
+//            }
+//            int version = dis.readInt();
+            int version = js.getInt("version");
+            if (version > VERSION) {
+                logger.warning("Playlist has newer version, expected: " + VERSION + " got: " + version);
+                throw new RuntimeException();
+            }
+//            int size = dis.readInt();
+            JSONArray tracks = js.getJSONArray("tracks");
+            int size = tracks.length();
+            for (int i = 0; i < size; i++) {
+                JSONObject trackObj = tracks.getJSONObject(i);
+                Track track = new Track();
+                TrackData trackData = track.getTrackData();
+                trackData.setLocation(trackObj.getString("location"));
+                trackData.setStartPosition(trackObj.getLong("start"));
+                trackData.setTotalSamples(trackObj.getLong("samples"));
+                trackData.setSubsongIndex(trackObj.getInt("idx"));
+                cache.cache(track);
+                trackData = track.getTrackData();
+                if (trackData.getSubsongIndex() > 0) {
+                    trackData.setCueEmbedded(trackObj.getInt("cue_embedded") != 0);
+                    if (!trackData.isCueEmbedded())
+                        trackData.setCueLocation(trackObj.getString("cue_location"));
+                }
+                trackData.setBps(trackObj.getInt("bps"));
+                trackData.setChannels(trackObj.getInt("channels"));
+                trackData.setSampleRate(trackObj.getInt("sample_rate"));
+                trackData.setBitrate(trackObj.getInt("bit_rate"));
+//                if (version == 1) {
+//                    trackData.setDateAdded(System.currentTimeMillis());
+//                } else {
+                trackData.setDateAdded(trackObj.getLong("date_added"));
+                trackData.setLastModified(trackObj.getLong("last_modified"));
+//                }
+//                int metaSize = dis.readInt();
+                JSONObject metaObj = trackObj.getJSONObject("meta");
+
+                for (String key : metaObj.keySet()) {
+//                    String key = dis.readUTF();
+                    String value = metaObj.getString(key);
+                    if (version == VERSION) {
+	                    if (key.equals(META_KEY_CODEC)) {
+	                        trackData.setCodec(value);
+                        } else if (key.equals(META_KEY_ENCODER)) {
+                            trackData.setEncoder(value);
+                        } else {
+                            trackData.addTagFieldValues(FieldKey.valueOf(key), value);
+                        }
+                    }
+                    // read older playlist version
+                    else {
+	                    if (key.equals(META_KEY_CODEC)) {
+	                        trackData.setCodec(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ARTIST)) {
+	                        trackData.addArtist(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ALBUM)) {
+	                        trackData.addAlbum(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ALBUM_ARTIST)) {
+	                        trackData.addAlbumArtist(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TITLE)) {
+	                        trackData.addTitle(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TRACK_NUMBER)) {
+	                        trackData.addTrack(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TOTAL_TRACKS)) {
+	                        trackData.addTrackTotal(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_DISC_NUMBER)) {
+	                        trackData.addDisc(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TOTAL_DISCS)) {
+	                        trackData.addDiscTotal(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_YEAR)) {
+	                        trackData.addYear(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_GENRE)) {
+	                        trackData.addGenre(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_COMMENT)) {
+	                        trackData.addComment(value);
+	                    }
+                    }
+                }
+
+                add(track);
+            }
+
+//            dis.close();
+        } catch (Exception e) {
+            logger.warning("Unknown format playlist " + file.getName() + ": " + e.getMessage());
+        }
+    }
+
     public boolean isLibraryView() {
         return libraryView;
     }
@@ -444,10 +683,16 @@ public class Playlist extends ArrayList<Track> {
             queue.addAll(loadM3U(address));
         } else if (ext.equals("pls")) {
             queue.addAll(loadPLS(address));
+        } else if(ext.equals("json")) {
+            Playlist newPl = new Playlist();
+            newPl.loadJSON(new File(address));
+            addAll(location, newPl);
         } else if (ext.equals("mus")) {
             Playlist newPl = new Playlist();
             newPl.load(new File(address));
             addAll(location, newPl);
+        } else if (ext.equals("ttpl")) {
+            addAll(location, TTPLParser.loadTTPL(new File(address), progress));
         } else {
             queue.push(address);
         }

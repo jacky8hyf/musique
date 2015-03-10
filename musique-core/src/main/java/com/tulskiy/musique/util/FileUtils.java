@@ -18,7 +18,11 @@
 package com.tulskiy.musique.util;
 
 import javax.swing.*;
+
 import java.io.File;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Maksim Liauchuk
@@ -50,5 +54,26 @@ public class FileUtils {
             }
         }
     }
+
+    /**
+     * replace illegal characters in a filename with "_"
+     * Windows illegal characters :
+     *           : \ / * ? | < >
+     * Illegal characters of Mac / Linux are a subset of above.
+     * //http://stackoverflow.com/questions/2357133/identifying-os-dependent-invalid-filename-characters-in-java-6-not-7 
+     * @param name
+     * @return
+     */
+     public static String sanitizeFilename(String name) {
+       return name.replaceAll("[:\\\\/*?|<>]", "_");
+     }
+
+     public static File getSanitizedPath(File directory, String fileName) throws InvalidPathException {
+         try {
+             return Paths.get(directory.getAbsolutePath(), fileName).toFile();
+         } catch (InvalidPathException ex) {
+             return Paths.get(directory.getAbsolutePath(), FileUtils.sanitizeFilename(fileName)).toFile();
+         }
+     }
 
 }

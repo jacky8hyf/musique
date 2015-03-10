@@ -46,10 +46,7 @@ public class GlobalHotKeysPlugin extends Plugin {
         PLAYER_PLAY_PAUSE(new HotKeyListener() {
             @Override
             public void onHotKey(HotKey hotKey) {
-                if (player.isStopped())
-                    player.play();
-                else
-                    player.pause();
+                player.playOrPause();
             }
         }),
         PLAYER_STOP(new HotKeyListener() {

@@ -61,10 +61,10 @@ public class Tray {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String cmd = e.getActionCommand().trim();
-                if (cmd.equalsIgnoreCase("play")) {
-                    player.play();
+                if (cmd.equalsIgnoreCase("play/pause")) {
+                    player.playOrPause();
                 } else if (cmd.equalsIgnoreCase("pause")) {
-                    player.pause();
+//                    player.pause();
                 } else if (cmd.equalsIgnoreCase("next")) {
                     player.next();
                 } else if (cmd.equalsIgnoreCase("previous")) {
@@ -78,8 +78,8 @@ public class Tray {
             }
         };
 
-        popup.add("   Play").addActionListener(al);
-        popup.add("   Pause").addActionListener(al);
+        popup.add("   Play/Pause").addActionListener(al);
+//        popup.add("   Pause").addActionListener(al);
         popup.add("   Next").addActionListener(al);
         popup.add("   Stop").addActionListener(al);
         popup.add("   Previous   ").addActionListener(al);

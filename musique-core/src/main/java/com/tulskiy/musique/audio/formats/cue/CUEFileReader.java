@@ -19,6 +19,7 @@ package com.tulskiy.musique.audio.formats.cue;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.EncodingDetector;
 
 import java.io.*;
 import java.util.List;
@@ -38,10 +39,10 @@ public class CUEFileReader extends AudioFileReader {
         if (cueParser == null)
             cueParser = new CUEParser();
         try {
-            LineNumberReader numberReader = new LineNumberReader(new InputStreamReader(
-                            new FileInputStream(file), defaultCharset));
+            LineNumberReader numberReader =
+                    new LineNumberReader(EncodingDetector.getInputStreamReader(file, defaultCharset));
             cueParser.parse(list, track, numberReader, false);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -54,5 +55,5 @@ public class CUEFileReader extends AudioFileReader {
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("cue");
     }
-
+    
 }

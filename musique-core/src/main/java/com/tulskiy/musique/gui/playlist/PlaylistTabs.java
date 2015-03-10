@@ -290,9 +290,13 @@ public class PlaylistTabs extends JPanel {
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fc.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter json2Filter = new FileNameExtensionFilter("Musique JSON Playlist (wrap lines)", "json");
+                FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter("Musique JSON Playlist", "json");
                 FileNameExtensionFilter musFiler = new FileNameExtensionFilter("Musique Playlist", "mus");
                 FileNameExtensionFilter m3uFilter = new FileNameExtensionFilter("M3U Playlist", "m3u", "m3u8");
                 FileNameExtensionFilter plsFiler = new FileNameExtensionFilter("PLS Playlist", "pls");
+                fc.addChoosableFileFilter(json2Filter);
+                fc.addChoosableFileFilter(jsonFilter);
                 fc.addChoosableFileFilter(musFiler);
                 fc.addChoosableFileFilter(m3uFilter);
                 fc.addChoosableFileFilter(plsFiler);
@@ -309,7 +313,11 @@ public class PlaylistTabs extends JPanel {
                         file = new File(file.getParent(),
                                 Util.removeExt(file.getName()) + "." + suffix);
                     }
-                    if (filter == musFiler) {
+                    if(filter == jsonFilter) {
+                        playlist.saveJSON(file);
+                    } else if(filter == json2Filter) {
+                        playlist.saveLineWrappedJSON(file);
+                    } else if (filter == musFiler) {
                         playlist.save(file);
                     } else if (filter == m3uFilter) {
                         playlist.saveM3U(file);
@@ -329,7 +337,9 @@ public class PlaylistTabs extends JPanel {
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fc.setMultiSelectionEnabled(false);
                 fc.setAcceptAllFileFilterUsed(false);
-                fc.addChoosableFileFilter(new FileNameExtensionFilter("All supported formats", "mus", "m3u", "m3u8", "pls"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("All supported formats", "mus", "m3u", "m3u8", "pls", "json", "ttpl"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("Musique JSON Playlist", "json"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("TTPlayer Playlist", "ttpl"));
                 fc.addChoosableFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
                 fc.addChoosableFileFilter(new FileNameExtensionFilter("M3U Playlist", "m3u", "m3u8"));
                 fc.addChoosableFileFilter(new FileNameExtensionFilter("PLS Playlist", "pls"));

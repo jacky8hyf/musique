@@ -21,6 +21,7 @@ import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.io.Buffer;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.Application;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -53,7 +54,40 @@ public class Player {
         bufferingThread.send(Message.OPEN, track);
     }
 
+    /**
+     * Switch between play and pause. If not started then start playing.
+     */
+    public void playOrPause() {
+        if (isStopped()) {
+            playFromStart();
+        } else {
+            sendPauseMessage();
+        }
+    }
+
+    /**
+     * @deprecated use {@link #playOrPause()}
+     */
     public void play() {
+        playFromStart();
+    }
+
+    /**
+     * @deprecated use {@link #playOrPause()}
+     */
+    public void pause() {
+        sendPauseMessage();
+    }
+
+    /**
+     * switch between play and pause. If not started at all then
+     * it is a nop.
+     */
+    private void sendPauseMessage() {
+    	playingThread.send(Message.PAUSE);
+    }
+    
+    private void playFromStart() {
         if (!isPaused()) {
             Track track = getTrack();
             if (track == null) {
@@ -67,9 +101,6 @@ public class Player {
         }
     }
 
-    public void pause() {
-        playingThread.send(Message.PAUSE);
-    }
 
     public void seek(long sample) {
         bufferingThread.send(Message.SEEK, sample);

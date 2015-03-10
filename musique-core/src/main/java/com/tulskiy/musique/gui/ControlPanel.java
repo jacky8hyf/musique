@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
+
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -42,7 +43,7 @@ import java.beans.PropertyChangeListener;
  * Date: 17.04.2011
  */
 
-public class ControlPanel extends javax.swing.JPanel {
+public class ControlPanel extends javax.swing.JPanel implements PlayerListener {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private Player player = app.getPlayer();
@@ -55,6 +56,8 @@ public class ControlPanel extends javax.swing.JPanel {
     private boolean progressEnabled = false;
     private Expression statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
     private MouseAdapter progressMouseListener;
+    private ImageIcon playIcon;
+    private ImageIcon pauseIcon;
 
     /**
      * Creates new form ControlBar
@@ -66,6 +69,10 @@ public class ControlPanel extends javax.swing.JPanel {
         initPlayerListeners();
         initPlaybackOrder();
         updateUI();
+
+        playIcon = new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/play.png"));
+        pauseIcon = new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/pause.png"));
+        Application.getInstance().getPlayer().addListener(this);
     }
 
     private void initPlayerListeners() {
@@ -243,7 +250,7 @@ public class ControlPanel extends javax.swing.JPanel {
         });
         playButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                player.play();
+                player.playOrPause();
             }
         });
         stopButton.addActionListener(new ActionListener() {
@@ -254,7 +261,7 @@ public class ControlPanel extends javax.swing.JPanel {
         });
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                player.pause();
+//                player.pause();
             }
         });
         nextButton.addActionListener(new ActionListener() {
@@ -346,7 +353,7 @@ public class ControlPanel extends javax.swing.JPanel {
         pauseButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         pauseButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
         pauseButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(pauseButton);
+//        jToolBar1.add(pauseButton);
 
         prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/prev.png"))); // NOI18N
         prevButton.setFocusable(false);
@@ -421,5 +428,20 @@ public class ControlPanel extends javax.swing.JPanel {
     javax.swing.JButton stopButton;
     javax.swing.JSlider volumeSlider;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void onEvent(PlayerEvent e) {
+        switch(e.getEventCode()) {
+        case STOPPED:
+        case PAUSED:
+            playButton.setIcon(playIcon);
+            break;
+        case PLAYING_STARTED:
+            playButton.setIcon(pauseIcon);
+            break;
+        default:
+            break;
+        }
+    }
 
 }

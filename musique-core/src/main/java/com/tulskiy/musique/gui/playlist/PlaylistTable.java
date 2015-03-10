@@ -128,16 +128,10 @@ public class PlaylistTable extends GroupTable {
                 player.stop();
             }
         });
-        aMap.put("play", new AbstractAction("Play") {
-            @Override
+        aMap.put("playOrPause", new AbstractAction("Play/Pause") {
+        	@Override
             public void actionPerformed(ActionEvent e) {
-                player.play();
-            }
-        });
-        aMap.put("pause", new AbstractAction("Pause") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                player.pause();
+                player.playOrPause();
             }
         });
         aMap.put("prev", new AbstractAction("Previous") {
@@ -207,8 +201,8 @@ public class PlaylistTable extends GroupTable {
 
         iMap.put(KeyStroke.getKeyStroke("B"), "next");
         iMap.put(KeyStroke.getKeyStroke("V"), "stop");
-        iMap.put(KeyStroke.getKeyStroke("C"), "pause");
-        iMap.put(KeyStroke.getKeyStroke("X"), "play");
+        iMap.put(KeyStroke.getKeyStroke("C"), "playOrPause");
+        iMap.put(KeyStroke.getKeyStroke("X"), "playOrPause");
         iMap.put(KeyStroke.getKeyStroke("Z"), "prev");
 
         iMap.put(KeyStroke.getKeyStroke("ENTER"), "playSelected");

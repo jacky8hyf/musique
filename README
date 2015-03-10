@@ -1,3 +1,27 @@
+This is a fork of @tulskiy 's musique project. Original repo at
+http://tulskiy.github.com/musique/
+
+This fork is intended to
+* (done) auto-detect encoding for CUE sheets
+    * see https://github.com/gpakosz/UnicodeBOMInputStream
+    * see https://code.google.com/p/juniversalchardet/
+* (dev)  auto-detect encoding for ID3 tags
+* (done) change the default playback control behavior; combined
+    play and pause to mimic the behavior of (iTunes-like) music
+    players. (So that C and X maps to the same behavior.)
+* (done) export and import playlists to JSON format
+* (done)  import TTPlayer playlists
+* (dev)  perform .lrc lyric search strategies
+* (dev)  change .cue processing strategy
+    * if the audio file is selected, then search for .cue and import
+      that .cue
+    * if the .cue is selected, then (from its content) determine the
+      audio file. If the file does not exist, find similar names from
+      the same folder.
+    * if both are selected, it will only be imported once.
+* (dev)  Provide options to disallow reordering the playlist
+* (not likely) beautify the GUI
+
 musique is a 100% Java audio player that supports most popular formats
 
     * MP3
@@ -25,11 +49,11 @@ Building
     for IntelliJ IDEA, NetBeans or Eclipse.
     Main class is com.tulskiy.musque.system.Main
 
-    Requirements: Sun JDK 1.6, or OpenJDK 1.6
+    Requirements: Sun JDK 1.7, or OpenJDK 1.7
 
 
 Shortcuts
-    Z, X, C, V, B - prev, play, pause, stop, next
+    Z, X, C, V, B - prev, play/pause, play/pause, stop, next
     Space - scroll to now playing
     Q - add selected tracks to queue
     Alt-Enter - tracks info / edit tags

@@ -31,6 +31,7 @@ import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -208,7 +209,7 @@ public class MainWindow extends JFrame {
                             setVisible(!isVisible());
                         }
                     } else if (e.getButton() == MouseEvent.BUTTON2) {
-                        app.getPlayer().pause();
+                        app.getPlayer().playOrPause();
                     }
                 }
             });
