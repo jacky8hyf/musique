@@ -59,6 +59,40 @@ public abstract class Task {
             }
         }
     }
+    
+    public static class LoadingPlaylistsTask extends Task {
+        private Playlist[] playlists;
+        private File[] files;
+        private int location;
+
+        public LoadingPlaylistsTask(Playlist[] playlists, File[] files, int location) {
+            this.playlists = playlists;
+            this.files = files;
+            this.location = location;
+        }
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+
+        @Override
+        public String getStatus() {
+            return "Reading File: " + String.valueOf(map.get("processing.file"));
+        }
+
+        @Override
+        public void abort() {
+            map.put("processing.stop", true);
+        }
+
+        @Override
+        public void start() {
+            for (int i = 0, len = Math.min(playlists.length, files.length);
+                    i < len; i++) {
+                int ret = playlists[i].insertItem(files[i].toString(), location, true, map);
+                if (location != -1)
+                    location += ret;
+            }
+        }
+    }
 
     public boolean isIndeterminate() {
         return true;

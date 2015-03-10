@@ -29,6 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -48,6 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.dialogs.TreeFileChooser;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistListener;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -355,6 +357,17 @@ public class PlaylistTabs extends JPanel {
             }
         });
 
+        aMap.put("loadPlaylistsFromFolder", new AbstractAction("Load Playlists from Folder") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreeFileChooser fc = new TreeFileChooser(getRootPane(), "Open Folder", false);
+                fc.setSelectionMode(javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION);
+                File[] files = fc.showOpenDialog();
+                if(files == null || files.length == 0) return;
+                loadPlaylistFromFiles(files[0].listFiles());
+            }
+        });
+
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -377,6 +390,15 @@ public class PlaylistTabs extends JPanel {
         });
     }
 
+    private void loadPlaylistFromFiles(File[] files) {
+        Playlist[] playlists = new Playlist[files.length];
+        for (int i = 0, len = files.length; i < len; i++) {
+            playlists[i] = addPlaylist(Util.capitalize(Util.removeExt(files[i].getName()), " "));
+        }
+        ProgressDialog dialog = new ProgressDialog(tabbedPane, "Adding Files");
+        dialog.show(new Task.LoadingPlaylistsTask(playlists, files, -1));
+    }
+    
     private JPopupMenu buildPopupMenu() {
         ActionMap aMap = tabbedPane.getActionMap();
         final JPopupMenu tabMenu = new JPopupMenu();
@@ -387,6 +409,7 @@ public class PlaylistTabs extends JPanel {
         tabMenu.addSeparator();
         tabMenu.add(aMap.get("savePlaylist"));
         tabMenu.add(aMap.get("loadPlaylist"));
+        tabMenu.add(aMap.get("loadPlaylistsFromFolder"));
         Util.fixIconTextGap(tabMenu);
         return tabMenu;
     }
