@@ -92,11 +92,14 @@ public class TTPLParser {
                     cuePlaylist.insertItem(absFile, -1, false, progress);
                     cues.put(absFile, cuePlaylist);
                 }
-                Track tk;
+                // subtrack is 1-indexed.
+                Track tk = null;
                 try {
-                    // subtrack is 1-indexed.
-                    tk = cuePlaylist.get(entry.subTrack - 1);
-                } catch (Exception ex) {
+                    tk = cuePlaylist.get(entry.subTrack - 1); // will just return null if no such subtrack
+                } catch (IndexOutOfBoundsException ex) {
+                    // handled below.
+                }
+                if(tk == null) {
                     logger.warning("ttpl skipping " + absFile + ":" + entry.subTrack + ": subtrack number too large");
                     continue;
                 }
