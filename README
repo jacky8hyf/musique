@@ -20,7 +20,10 @@ This fork is intended to
       the same folder.
     * if both are selected, it will only be imported once.
 * (dev)  Provide options to disallow reordering the playlist
-* (not likely) beautify the GUI
+* (done) auto-detect file format if its extension is wrong
+    * (dev) potential race condition for guessed files; PlayingThread.
+      openNext() may not go to the correct result given by
+      BufferingThread
 
 musique is a 100% Java audio player that supports most popular formats
 

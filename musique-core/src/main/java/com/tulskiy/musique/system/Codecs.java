@@ -104,7 +104,28 @@ public class Codecs {
             return null;
         }
         String ext = Util.getFileExt(location.toString()).toLowerCase();
-        return decoders.get(ext);
+        Decoder extDec = decoders.get(ext);
+        if (tryDecoder(extDec, track)) {
+            return extDec;
+        }
+        for(Decoder tryDec : decoders.values()) {
+            if(tryDecoder(tryDec, track)) {
+                logger.fine("file " + location + " decoded with decoder " + tryDec.getClass().getSimpleName());
+                return tryDec;
+            }
+        }
+        logger.warning("unknown codec, returning codec for " + ext + " but is definitely failing");
+        return extDec;
+    }
+
+    private static boolean tryDecoder(Decoder decoder, Track track) {
+        try {
+            return decoder.open(track);
+        } catch (Exception ex) {
+            return false;
+        } finally {
+            try {decoder.close();} catch (Exception ex) {/*ignored*/}
+        }
     }
 
     public static Decoder getNewDecoder(Track track) {
