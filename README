@@ -1,29 +1,40 @@
 This is a fork of @tulskiy 's musique project. Original repo at
 http://tulskiy.github.com/musique/
 
-This fork is intended to
+This fork is intended to support
 * (done) auto-detect encoding for CUE sheets
     * see https://github.com/gpakosz/UnicodeBOMInputStream
     * see https://code.google.com/p/juniversalchardet/
-* (dev)  auto-detect encoding for ID3 tags
-* (done) change the default playback control behavior; combined
-    play and pause to mimic the behavior of (iTunes-like) music
-    players. (So that C and X maps to the same behavior.)
 * (done) export and import playlists to JSON format
-* (done)  import TTPlayer playlists
-* (dev)  perform .lrc lyric search strategies
-* (dev)  change .cue processing strategy
-    * if the audio file is selected, then search for .cue and import
-      that .cue
-    * if the .cue is selected, then (from its content) determine the
-      audio file. If the file does not exist, find similar names from
-      the same folder.
-    * if both are selected, it will only be imported once.
-* (dev)  Provide options to disallow reordering the playlist
-* (done) auto-detect file format if its extension is wrong
+* (done) import TTPlayer playlists
+* (done) auto-detect audio codec if its extension is wrong
     * (dev) potential race condition for guessed files; PlayingThread.
       openNext() may not go to the correct result given by
       BufferingThread
+* (dev)  perform .lrc lyrics search strategies
+* (dev)  Provide options to disallow reordering the playlist
+* (dev)  auto-detect encoding for ID3 tags
+
+
+and change
+* (done) the default playback control behavior; combined
+  play and pause to mimic the behavior of (iTunes-like) music
+  players. (So that key shortcut C and X maps to the same behavior.)
+* (dev)  change .cue processing strategy
+    * (dev) if the audio file is selected, then search for .cue and import
+      that .cue (currently just blindly ignore the audio file if .cue exists)
+    * (done) if the .cue is selected, then (from its content) determine the
+      audio file. If the file does not exist, find similar names from
+      the same folder.
+    * (dev) if both are selected, it will only be imported once.
+
+and fix
+* (done) FLACDecoder.open() returns false on error (instead of blindly)
+  returns true.
+
+dev = in development; done = just done :)
+
+--------------------Below is the original README---------------------
 
 musique is a 100% Java audio player that supports most popular formats
 
