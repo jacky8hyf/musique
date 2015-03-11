@@ -68,9 +68,9 @@ public class FLACDecoder implements Decoder {
         return streamInfo.getAudioFormat();
     }
 
-    private void parseMetadata() {
+    private void parseMetadata() throws IOException {
         streamInfo = null;
-        try {
+//        try {
             Metadata[] metadata = decoder.readMetadata();
             for (Metadata m : metadata) {
                 if (m instanceof StreamInfo)
@@ -78,9 +78,9 @@ public class FLACDecoder implements Decoder {
                 else if (m instanceof SeekTable)
                     seekTable = (SeekTable) m;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void seekSample(long sample) {
