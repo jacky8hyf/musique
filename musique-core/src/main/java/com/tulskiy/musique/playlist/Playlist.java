@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,9 +66,7 @@ import com.tulskiy.musique.util.Util;
  */
 public class Playlist extends ArrayList<Track> {
 
-    private static final Charset CHARSET = Charset.forName("UTF-8");
-
-	private static final String OLD_META_KEY_COMMENT = "comment";
+    private static final String OLD_META_KEY_COMMENT = "comment";
 	private static final String OLD_META_KEY_GENRE = "genre";
 	private static final String OLD_META_KEY_YEAR = "year";
 	private static final String OLD_META_KEY_TOTAL_DISCS = "totalDiscs";
@@ -391,7 +388,7 @@ public class Playlist extends ArrayList<Track> {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-            fos.write(js.toString(indentFactor).getBytes(CHARSET));
+            fos.write(js.toString(indentFactor).getBytes(EncodingDetector.DEFAULT_TEXT_CHARSET));
         } catch (IOException e) {
             logger.warning("Failed to save playlist " + file.getName() + ": " + e.getMessage());
         } finally {
@@ -407,7 +404,7 @@ public class Playlist extends ArrayList<Track> {
         String read;
         Scanner scan = null;
         try {
-            scan = new Scanner(EncodingDetector.getInputStreamReader(file, CHARSET)).useDelimiter("\\A");
+            scan = new Scanner(EncodingDetector.getInputStreamReader(file)).useDelimiter("\\A");
             read = scan.next();
         } catch (IOException e) {
             logger.warning("Failed to load playlist " + file.getName() + ": "

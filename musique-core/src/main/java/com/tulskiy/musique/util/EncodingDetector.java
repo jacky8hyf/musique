@@ -58,4 +58,15 @@ public class EncodingDetector {
         // http://stackoverflow.com/questions/14918188/reading-text-file-with-utf-8-encoding-using-java
         return new InputStreamReader(fis, detect(file, defaultCharset));
     }
+
+    /**
+     * @see #getInputStreamReader(File, Charset)
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public static final InputStreamReader getInputStreamReader(File file) throws IOException {
+        return getInputStreamReader(file, DEFAULT_TEXT_CHARSET); 
+    }
+    public static final Charset DEFAULT_TEXT_CHARSET = Charset.forName("UTF-8");
 }

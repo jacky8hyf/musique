@@ -40,7 +40,7 @@ public class CUEFileReader extends AudioFileReader {
             cueParser = new CUEParser();
         try {
             LineNumberReader numberReader =
-                    new LineNumberReader(EncodingDetector.getInputStreamReader(file, defaultCharset));
+                    new LineNumberReader(EncodingDetector.getInputStreamReader(file));
             cueParser.parse(list, track, numberReader, false);
         } catch (IOException e) {
             e.printStackTrace();

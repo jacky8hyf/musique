@@ -57,6 +57,7 @@ import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.spi.PluginLoader;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.util.EncodingDetector;
 import com.tulskiy.musique.util.Util;
 
 public class Application {
@@ -116,8 +117,8 @@ public class Application {
     public void load() {
         configuration = new Configuration();
         try {
-            configuration.load(new FileReader(configFile));
-        } catch (FileNotFoundException ignored) {
+            configuration.load(EncodingDetector.getInputStreamReader(configFile));
+        } catch (IOException ignored) {
         }
 
         if (configuration.getBoolean("system.oneInstance", false)
