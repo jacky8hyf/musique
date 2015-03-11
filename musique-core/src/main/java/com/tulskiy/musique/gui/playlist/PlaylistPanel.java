@@ -161,7 +161,8 @@ public class PlaylistPanel extends JPanel {
         PlaylistManager playlistManager = app.getPlaylistManager();
         ArrayList<Playlist> playlists = playlistManager.getPlaylists();
 
-        for (int n = 0; n < columnModels.size(); n++) {
+        for (int n = 0, len = Math.min(columnModels.size(), playlists.size());
+                n < len; n++) {
             List<PlaylistColumn> columns = playlists.get(n).getColumns();
             TableColumnModel columnModel = columnModels.get(n);
             for (int i = 0; i < columnModel.getColumnCount(); i++) {
