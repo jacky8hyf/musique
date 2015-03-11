@@ -738,6 +738,8 @@ public class Playlist extends ArrayList<Track> {
                                 }
                             }
                             reader.read(file, temp);
+                        } else {
+                            logger.warning("unrecovnized " + Util.getFileExt(file) + " file: " + file);
                         }
                     }
                 }
