@@ -21,6 +21,7 @@
  */
 package com.tulskiy.musique.system;
 
+import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -33,6 +34,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -121,6 +123,8 @@ public class Application {
         } catch (IOException ignored) {
         }
 
+        patchConfigFile();
+
         if (configuration.getBoolean("system.oneInstance", false)
                 && !tryLock()) {
             JOptionPane.showMessageDialog(null, "Only one instance of Musique can be run at a time", VERSION, JOptionPane.ERROR_MESSAGE);
@@ -149,6 +153,23 @@ public class Application {
         });
 
         loadSettings();
+    }
+
+    private void patchConfigFile() {
+        File patchFile = new File(configFile.getParentFile(), configFile.getName() + ".patch");
+        if(!patchFile.isFile()) return;
+        try (Scanner scan = new Scanner(EncodingDetector.getInputStreamReader(patchFile))) {
+            while(scan.hasNextLine()) {
+                String line = scan.nextLine();
+                if(line.trim().startsWith("#")) continue;
+                int ind = line.indexOf('=');
+                if(ind == -1) continue;
+                String key = line.substring(0, ind).trim();
+                String value = line.substring(ind + 1).trim();
+                configuration.setProperty(key, value);
+            }
+        } catch (IOException ignored) {
+        }
     }
 
     private boolean tryLock() {
@@ -268,6 +289,51 @@ public class Application {
 //                UIManager.put("TextArea.font", defaultFont);
             }
         });
+
+        loadFontFromConfig();
+        PropertyChangeListener fontChange = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                loadFontFromConfig();
+            }
+        };
+        configuration.addPropertyChangeListener("gui.font.fontname", fontChange);
+        configuration.addPropertyChangeListener("gui.font.style", fontChange);
+        configuration.addPropertyChangeListener("gui.font.size", fontChange);
+    }
+
+    private void loadFontFromConfig() {
+        String fontName = configuration.getString("gui.font.fontname", null);
+        int style = configuration.getInt("gui.font.style", -1);
+        int size = configuration.getInt("gui.font.size", -1);
+        if(fontName == null || style == -1 || size == -1) return;
+        setFont(new Font(fontName, style, size));
+    }
+
+    private void setFont(Font defaultFont) {
+        try {
+            UIManager.put("defaultFont", defaultFont);
+            UIManager.put("Table.font", defaultFont);
+            UIManager.put("Menu.font", defaultFont);
+            UIManager.put("Button.font", defaultFont);
+            UIManager.put("ComboBox.font", defaultFont);
+            UIManager.put("Tree.font", defaultFont);
+            UIManager.put("CheckBox.font", defaultFont);
+            UIManager.put("TableHeader.font", defaultFont);
+            UIManager.put("PopupMenu.font", defaultFont);
+            UIManager.put("RadioButtonMenuItem.font", defaultFont);
+            UIManager.put("RadioButton.font", defaultFont);
+            UIManager.put("CheckBoxMenuItem.font", defaultFont);
+            UIManager.put("TextField.font", defaultFont);
+            UIManager.put("MenuItem.font", defaultFont);
+            UIManager.put("Label.font", defaultFont);
+            UIManager.put("TitledBorder.font", defaultFont.deriveFont(Font.BOLD));
+            UIManager.put("TabbedPane.font", defaultFont);
+            UIManager.put("TextArea.font", defaultFont);
+        } catch (Exception ex) {
+            logger.warning("cannot set font: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+            /* ignored */
+        }
     }
 
     public void start() {
