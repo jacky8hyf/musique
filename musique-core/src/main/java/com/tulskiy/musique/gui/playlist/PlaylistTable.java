@@ -251,7 +251,8 @@ public class PlaylistTable extends GroupTable {
         getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
+                if (e.getButton() == MouseEvent.BUTTON1
+                        && config.getBoolean("playlists.allowSortByColumn", true)) {
                     TableColumnModel model = getTableHeader().getColumnModel();
                     int index = model.getColumnIndexAtX(e.getX());
                     if (index != -1) {

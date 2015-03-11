@@ -206,7 +206,8 @@ public class PlaylistTabs extends JPanel {
                         e.getClickCount() == 2) {
                     tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-                } else if (e.getButton() == MouseEvent.BUTTON2) {
+                } else if (e.getButton() == MouseEvent.BUTTON2
+                        && config.getBoolean("playlists.tabs.middleClickRemove", true)) {
                     int index = tabbedPane.indexAtLocation(e.getX(), e.getY());
                     if (index != -1) {
                         Playlist playlist = getTableAt(index).getPlaylist();
