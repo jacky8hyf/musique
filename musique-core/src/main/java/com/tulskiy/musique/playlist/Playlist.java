@@ -388,7 +388,7 @@ public class Playlist extends ArrayList<Track> {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-            fos.write(js.toString(indentFactor).getBytes(EncodingDetector.DEFAULT_TEXT_CHARSET));
+            fos.write(js.toString(indentFactor).getBytes(EncodingDetector.getDefaultTextCharset()));
         } catch (IOException e) {
             logger.warning("Failed to save playlist " + file.getName() + ": " + e.getMessage());
         } finally {

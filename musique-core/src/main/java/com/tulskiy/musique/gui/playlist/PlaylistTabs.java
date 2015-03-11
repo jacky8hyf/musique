@@ -368,6 +368,18 @@ public class PlaylistTabs extends JPanel {
             }
         });
 
+        aMap.put("saveAllPlaylistsJSON", new AbstractAction("Save All Playlists in JSON") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreeFileChooser fc = new TreeFileChooser(getRootPane(), "Open Folder", false);
+                fc.setSelectionMode(javax.swing.tree.TreeSelectionModel.SINGLE_TREE_SELECTION);
+                File[] files = fc.showOpenDialog();
+                if(files == null || files.length == 0) return;
+                File dir = files[0];
+                playlistManager.exportPlaylistsJSON(dir);
+            }
+        });
+
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -408,6 +420,7 @@ public class PlaylistTabs extends JPanel {
         tabMenu.add(aMap.get("removePlaylist"));
         tabMenu.addSeparator();
         tabMenu.add(aMap.get("savePlaylist"));
+        tabMenu.add(aMap.get("saveAllPlaylistsJSON"));
         tabMenu.add(aMap.get("loadPlaylist"));
         tabMenu.add(aMap.get("loadPlaylistsFromFolder"));
         Util.fixIconTextGap(tabMenu);

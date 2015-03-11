@@ -7,6 +7,7 @@ This fork is intended to support
     * see https://code.google.com/p/juniversalchardet/
 * (done) export and import playlists to JSON format
 * (done) import TTPlayer playlists
+* (done) save (JSON) and load (all formats) playlists from folder
 * (done) auto-detect audio codec if its extension is wrong
     * (dev) potential race condition for guessed files; PlayingThread.
       openNext() may not go to the correct result given by

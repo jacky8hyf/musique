@@ -213,8 +213,16 @@ public class Application {
             }
         }
 
-        Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
-        AudioFileReader.setDefaultCharset(charset);
+        try {
+            Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
+            AudioFileReader.setDefaultCharset(charset);
+        } catch (Exception ex) {/* ignored */}
+        
+        try {
+            Charset charset = Charset.forName(configuration.getString("text.defaultEncoding", "UTF-8"));
+            EncodingDetector.setDefaultTextCharset(charset);
+        } catch (Exception ex) {/* ignored */}
+        
         try {
             String laf = configuration.getString("gui.LAF", "");
             if (laf.isEmpty()) {

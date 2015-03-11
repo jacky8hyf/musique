@@ -223,7 +223,7 @@ public class PlaylistManager {
         listeners.remove(playlistListener);
     }
 
-    public void exportPlaylists(File directory) {
+    public void exportPlaylistsJSON(File directory) {
         if(!directory.exists()) {
             directory.mkdirs();
         }
@@ -233,7 +233,7 @@ public class PlaylistManager {
         }
         for(Playlist pl : playlists) {
             try {
-                String fileName = pl.getName();
+                String fileName = pl.getName() + ".json";
                 File f = Util.getSanitizedPath(directory, fileName);
                 pl.saveLineWrappedJSON(f);
             } catch (InvalidPathException ex) {

@@ -13,6 +13,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 // https://code.google.com/p/juniversalchardet/
 public class EncodingDetector {
+    private EncodingDetector(){} // prevents instantiation
     private static Logger log = Logger.getLogger(EncodingDetector.class.getName());
     /**
      * Detect encoding.
@@ -66,7 +67,15 @@ public class EncodingDetector {
      * @throws IOException
      */
     public static final InputStreamReader getInputStreamReader(File file) throws IOException {
-        return getInputStreamReader(file, DEFAULT_TEXT_CHARSET); 
+        return getInputStreamReader(file, defaultTextCharset); 
     }
-    public static final Charset DEFAULT_TEXT_CHARSET = Charset.forName("UTF-8");
+    private static Charset defaultTextCharset = Charset.forName("UTF-8");
+
+    public static Charset getDefaultTextCharset() {
+        return defaultTextCharset;
+    }
+    public static void setDefaultTextCharset(Charset charset) {
+        defaultTextCharset = charset;
+    }
+    
 }
