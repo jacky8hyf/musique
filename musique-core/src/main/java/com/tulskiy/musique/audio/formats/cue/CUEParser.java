@@ -18,6 +18,7 @@
 package com.tulskiy.musique.audio.formats.cue;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.List;
@@ -33,6 +34,7 @@ import jwbroek.cuelib.TrackData;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -47,13 +49,15 @@ public class CUEParser {
             if (datas.size() > 0) {
                 for (FileData fileData : datas) {
                     if (!embedded) {
-                        String parent = file.getTrackData().getFile().getParent();
-                        File referencedFile = new File(parent, fileData.getFile());
-                        if (!referencedFile.exists())
-                            continue;
-                        AudioFileReader reader = TrackIO.getAudioFileReader(referencedFile.getName());
-                        if (reader == null) break;
-                        file = reader.read(referencedFile);
+//                        String parent = file.getTrackData().getFile().getParent();
+//                        File referencedFile = new File(parent, fileData.getFile());
+//                        if (!referencedFile.exists())
+//                            continue;
+//                        AudioFileReader reader = TrackIO.getAudioFileReader(referencedFile.getName());
+//                        if (reader == null) break;
+//                        file = reader.read(referencedFile);
+                        file = guessAudioTrack(file, fileData);
+                        if(file == null) break;
                     }
 
                     int size = fileData.getTrackData().size();
@@ -99,6 +103,40 @@ public class CUEParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static File[] findRefFiles(Track file, FileData fileData, final String fileNameWithoutExt) {
+        String parent = file.getTrackData().getFile().getParent();
+        File referencedFile = new File(parent, fileData.getFile());
+        if (referencedFile.exists()) {
+            return new File[] { referencedFile };
+        }
+        File parentFile = file.getTrackData().getFile().getParentFile();
+        File[] children = parentFile.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return Util.removeExt(name)
+                        .equalsIgnoreCase(fileNameWithoutExt);
+            }
+
+        });
+        return children;
+    }
+
+    private static Track guessAudioTrack(Track file, FileData fileData) {
+        final String fileNameWithoutExt = Util.removeExt(file.getTrackData().getFile().getName());
+        File[] possibleRefFiles = findRefFiles(file, fileData, fileNameWithoutExt);
+        for (File ref : possibleRefFiles) {
+            if (Util.getFileExt(ref).equalsIgnoreCase("cue")) {
+                continue;
+            }
+            AudioFileReader afr = TrackIO.getAudioFileReader(ref.getName());
+            if (afr != null) {
+                return afr.read(ref);
+            }
+        }
+        return null;
     }
 
     private long indexToSample(Index index, int sampleRate) {

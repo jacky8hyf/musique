@@ -26,7 +26,7 @@ import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.system.configuration.PlaylistConfiguration;
-import com.tulskiy.musique.util.FileUtils;
+import com.tulskiy.musique.util.Util;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -234,7 +234,7 @@ public class PlaylistManager {
         for(Playlist pl : playlists) {
             try {
                 String fileName = pl.getName();
-                File f = FileUtils.getSanitizedPath(directory, fileName);
+                File f = Util.getSanitizedPath(directory, fileName);
                 pl.saveLineWrappedJSON(f);
             } catch (InvalidPathException ex) {
                 logger.warning(directory.getPath() + " is not a valid file path!");

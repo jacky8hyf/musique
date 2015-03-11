@@ -13,7 +13,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 // https://code.google.com/p/juniversalchardet/
 public class EncodingDetector {
-    private static Logger log = Logger.getLogger(EncodingDetector.class.getCanonicalName());
+    private static Logger log = Logger.getLogger(EncodingDetector.class.getName());
     /**
      * Detect encoding.
      * @param file
@@ -33,7 +33,7 @@ public class EncodingDetector {
             detector.dataEnd();
             encoding = detector.getDetectedCharset();
             if (encoding != null) {
-                log.fine(String.format("encoding = %s for file %s", encoding, file));
+                log.finest(String.format("encoding = %s for file %s", encoding, file));
                 return Charset.forName(encoding);
             } else {
                 log.warning(String.format("encoding unknown for file %s, using default %s", file, fallback.name()));

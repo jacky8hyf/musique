@@ -267,4 +267,21 @@ public class Util {
         
         return null;
     }
+
+    /**
+     * replace illegal characters in a filename with "_"
+     * Windows illegal characters :
+     *           : \ / * ? | < >
+     * Illegal characters of Mac / Linux are a subset of above.
+     * //http://stackoverflow.com/questions/2357133/identifying-os-dependent-invalid-filename-characters-in-java-6-not-7 
+     * @param name
+     * @return
+     */
+     public static String sanitizeFilename(String name) {
+         return name.replaceAll("[:\\\\/*?|<>]", "_");
+     }
+
+    public static File getSanitizedPath(File directory, String fileName) {
+         return new File(directory, sanitizeFilename(fileName));
+     }
 }
