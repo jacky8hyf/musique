@@ -75,7 +75,7 @@ public class TTPLParser {
             return new Playlist();
         }
         Playlist ret = new Playlist();
-        Map<String, Playlist> cues = new HashMap<>();
+        Map<String, Playlist> cues = new HashMap<String, Playlist>();
 
         for(TTPlaylistEntry entry : entries) {
             String absFile = new File(entry.file).getAbsolutePath();

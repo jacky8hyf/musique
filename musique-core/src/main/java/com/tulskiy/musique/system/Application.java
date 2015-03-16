@@ -158,7 +158,9 @@ public class Application {
     private void patchConfigFile() {
         File patchFile = new File(configFile.getParentFile(), configFile.getName() + ".patch");
         if(!patchFile.isFile()) return;
-        try (Scanner scan = new Scanner(EncodingDetector.getInputStreamReader(patchFile))) {
+        Scanner scan = null;
+        try {
+        	scan = new Scanner(EncodingDetector.getInputStreamReader(patchFile));
             while(scan.hasNextLine()) {
                 String line = scan.nextLine();
                 if(line.trim().startsWith("#")) continue;
@@ -169,6 +171,10 @@ public class Application {
                 configuration.setProperty(key, value);
             }
         } catch (IOException ignored) {
+        } finally {
+        	if(scan != null) {
+        		scan.close();
+        	}
         }
     }
 

@@ -13,7 +13,10 @@ This fork is intended to support
       openNext() may not go to the correct result given by
       BufferingThread
 * (dev)  perform .lrc lyrics search strategies
-* (dev)  Provide options to disallow reordering the playlist
+* (done) Provide option to disallow reordering the playlist
+    * set playlists.allowSortByColumn = false
+* (done) Provide option to disallow middle click closing tabs
+    * set playlists.tabs.middleClickRemove = false
 * (dev)  auto-detect encoding for ID3 tags
 
 

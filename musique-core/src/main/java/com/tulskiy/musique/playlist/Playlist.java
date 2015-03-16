@@ -463,7 +463,8 @@ public class Playlist extends ArrayList<Track> {
 //                int metaSize = dis.readInt();
                 JSONObject metaObj = trackObj.getJSONObject("meta");
 
-                for (String key : metaObj.keySet()) {
+                for (Object k : metaObj.keySet()) {
+                	String key = (String) k;
 //                    String key = dis.readUTF();
                     String value = metaObj.getString(key);
                     if (version == VERSION) {
