@@ -29,7 +29,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;

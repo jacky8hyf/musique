@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project musique-core with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="../dist/musique.jar">
+            <manifest>
+                <attribute name="Main-Class" value="com.tulskiy.musique.system.Main"/>
+                <attribute name="Class-Path" value=". musique_lib/jkeymaster-1.0.jar musique_lib/jna-3.2.7.jar musique_lib/commons-configuration-1.6.jar musique_lib/commons-collections-3.2.1.jar musique_lib/commons-lang-2.4.jar musique_lib/commons-logging-1.1.1.jar musique_lib/commons-digester-1.8.jar musique_lib/commons-beanutils-1.7.0.jar musique_lib/commons-beanutils-core-1.8.0.jar musique_lib/json-20140107.jar musique_lib/juniversalchardet-1.0.3.jar"/>
+            </manifest>
+            <fileset dir="musique-core/target/classes"/>
+            <fileset dir="dependencies/alacdecoder/target/classes"/>
+            <fileset dir="dependencies/jaad/target/classes"/>
+            <fileset dir="dependencies/cuelib/target/classes"/>
+            <fileset dir="dependencies/jaudiotagger/target/classes"/>
+            <fileset dir="dependencies/javaFlacEncoder/target/classes"/>
+            <fileset dir="dependencies/jflac/target/classes"/>
+            <fileset dir="dependencies/tta/target/classes"/>
+            <fileset dir="dependencies/vorbis-java/target/classes"/>
+            <fileset dir="dependencies/wavpack/target/classes"/>
+            <fileset dir="dependencies/jmac/target/classes"/>
+            <fileset dir="dependencies/javalayer/target/classes"/>
+            <fileset dir="dependencies/jorbis/target/classes"/>
+            <fileset dir="dependencies/last.fm-bindings/target/classes"/>
+            <fileset dir="dependencies/discogs/target/classes"/>
+        </jar>
+    </target>
+</project>

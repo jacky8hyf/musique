@@ -29,9 +29,6 @@ import com.tulskiy.musique.system.configuration.PlaylistConfiguration;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -236,8 +233,8 @@ public class PlaylistManager {
                 String fileName = pl.getName() + ".json";
                 File f = Util.getSanitizedPath(directory, fileName);
                 pl.saveLineWrappedJSON(f);
-            } catch (InvalidPathException ex) {
-                logger.warning(directory.getPath() + " is not a valid file path!");
+            } catch (Exception ex) {
+                logger.warning("cannot be saved to " + directory.getPath());
                 continue;
             }
         }
