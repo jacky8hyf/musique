@@ -18,6 +18,8 @@ This fork is intended to support
 * (done) Provide option to disallow middle click closing tabs
     * set playlists.tabs.middleClickRemove = false
 * (dev)  auto-detect encoding for ID3 tags
+* (dev)  bug fix: importing cue with multiple file reference may
+         have incorrect order.
 
 
 and change
